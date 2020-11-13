@@ -1,0 +1,9 @@
+FROM php:7.4-fpm-alpine
+
+# Install
+RUN apk update && apk add php-intl pngquant libpng-dev curl libmcrypt-dev libxml2-dev git libxslt-dev libzip-dev zip unzip g++ icu icu-libs icu-dev \
+    && docker-php-ext-configure gd \
+    && docker-php-ext-install zip ctype dba iconv json bcmath gd xml xmlrpc dom session intl soap opcache xsl mysqli pdo pdo_mysql
+
+# Install Composer PHP
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer

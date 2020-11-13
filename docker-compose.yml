@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  php7:
+    build: 
+      context: ./
+      dockerfile: ./php/Dockerfile-PHP7
+    networks:
+      - backend
+    volumes:
+      - ./www:/var/www/html/php7/
+    container_name: "php-fpm-7"
+  php5:
+    build: 
+      context: ./
+      dockerfile: ./php/Dockerfile-PHP5
+    networks:
+      - backend
+    volumes:
+      - ./www:/var/www/html/php5/
+    container_name: "php-fpm-5"
+  apache:
+    build:
+      context: ./
+      dockerfile: ./apache/Dockerfile
+    depends_on:
+      - php7
+      - php5
+      - mariadb
+    networks:
+      - backend
+      - frontend
+    ports:
+      - '80:80'
+    volumes:
+      - ./www:/var/www/html/php5/
+      - ./www:/var/www/html/php7/
+    container_name: "www"
+  
+  mariadb:
+    image: mariadb:latest
+    restart: always
+    command: >
+        --character-set-server=utf8mb4
+        --collation-server=utf8mb4_bin
+        --innodb_file_format=barracuda
+        --innodb_file_per_table=On
+        --innodb_large_prefix=On
+    volumes:
+        - "banco:/var/lib/mysql:rw"
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: qisat
+      MYSQL_DATABASE: test
+      MYSQL_USER: qisat
+      MYSQL_PASSWORD: qisat.123
+    networks:
+      - backend
+    container_name: "mdb"
+
+networks:
+  backend:
+  frontend:
+
+volumes:
+  banco:
